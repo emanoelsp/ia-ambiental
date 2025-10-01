@@ -17,7 +17,7 @@ A aplicação é composta por um frontend (IA Ambiental) que consome uma API de 
 
 O diagrama abaixo ilustra o fluxo de dados e as interações entre os componentes:
 
-![Diagrama da Arquitetura do Projeto](https://i.imgur.com/39aQ4Jv.jpeg)
+![Diagrama da Arquitetura](public/images/Arq.jpg)
 
 **Detalhes dos Fluxos:**
 
