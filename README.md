@@ -67,9 +67,9 @@ Siga os passos abaixo para clonar, instalar as dependências e executar o projet
     ```
 
 3.  **Instale as dependências:**
-        ```bash
-        npm install
-        ```
+      ```bash
+      npm install
+      ```
 
 5.  **Executar o projeto localmente:**
     ```bash
@@ -77,7 +77,7 @@ Siga os passos abaixo para clonar, instalar as dependências e executar o projet
     ```
  O servidor será iniciado, e a aplicação estará pronta para enviar as requisições.
  
-6.  **Acessar a aplicacao:**
+6.  **Acessar a aplicação:**
     ```bash
     https://localhost:3000
     ```
