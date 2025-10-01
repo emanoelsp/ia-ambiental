@@ -58,7 +58,7 @@ Siga os passos abaixo para clonar, instalar as dependências e executar o projet
 
 1.  **Clone o repositório:**
     ```bash
-    [git clone https://github.com/emanoelsp/desfinal-aprendizagemdemaquina.git](https://github.com/emanoelsp/ia-ambiental.git)
+    git clone (https://github.com/emanoelsp/ia-ambiental.git
     ```
 
 2.  **Navegue até o diretório do projeto:**
