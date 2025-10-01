@@ -15,17 +15,16 @@ import {
 } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
-  Zap,
-  MapPin,
+  
   Thermometer,
   Wind,
   Brain,
   CloudRain,
   Skull,
-  Droplets,
-  Cloud,
+ 
   Loader2,
   AlertTriangle,
+  FileDigit, // Novo ícone para entrada de dados
 } from "lucide-react"
 
 // --- Componente para a visualização gráfica ---
@@ -67,18 +66,18 @@ export default function SolucaoPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [manualData, setManualData] = useState({
-    temperatura: "",
-    umidade: "",
-    co2: "",
-    co: "",
-    no2: "",
-    so2: "",
-    o3: "",
-    pressao: "",
+    Temperatura: "28",
+    Umidade: "85",
+    CO2: "900",
+    CO: "2.5",
+    Pressao_Atm: "1010",
+    NO2: "80",
+    SO2: "55",
+    O3: "150",
   })
   const [locationData, setLocationData] = useState({
     cidade: "",
-    pais: "Brasil", // Valor padrão
+    pais: "Brasil",
   })
 
   // --- Função de chamada à API por localização ---
@@ -119,6 +118,54 @@ export default function SolucaoPage() {
     }
   }
 
+  // --- Função de predição com dados manuais (simulada) ---
+  const handleManualPrediction = async () => {
+    const isInvalid = Object.values(manualData).some((value) => value === "")
+    if (isInvalid) {
+      setError("Por favor, preencha todos os campos manuais.")
+      return
+    }
+
+    setIsLoading(true)
+    setError(null)
+    setPredictionResult(null)
+
+    // Simula uma chamada de API
+    setTimeout(() => {
+      const features = {
+        Temperatura: parseFloat(manualData.Temperatura),
+        Umidade: parseFloat(manualData.Umidade),
+        CO2: parseFloat(manualData.CO2),
+        CO: parseFloat(manualData.CO),
+        Pressao_Atm: parseFloat(manualData.Pressao_Atm),
+        NO2: parseFloat(manualData.NO2),
+        SO2: parseFloat(manualData.SO2),
+        O3: parseFloat(manualData.O3),
+      }
+
+      // Lógica de simulação simples para o resultado
+      let label = "Boa"
+      if (features.CO2 > 800 || features.NO2 > 60 || features.O3 > 120) {
+        label = "Ruim"
+      } else if (features.CO2 > 500 || features.NO2 > 30 || features.O3 > 70) {
+        label = "Moderada"
+      }
+
+      const mockResult = {
+        cidade: "Dados Manuais",
+        pais: "",
+        features_usadas: features,
+        risco_chuva_acida: features.SO2 > 50 ? "Alto" : "Baixo",
+        fumaca_toxica: features.CO > 2 ? "Moderado" : "Baixo",
+        risco_efeito_estufa: features.CO2 > 700 ? "Alto" : "Moderado",
+        prediction: null,
+        label: label,
+      }
+      setPredictionResult(mockResult)
+      setIsLoading(false)
+    }, 1500)
+  }
+
   // --- Funções de estilo ---
   const getRiskColor = (risco: string) => {
     if (!risco) return "text-gray-600 bg-gray-100"
@@ -151,6 +198,11 @@ export default function SolucaoPage() {
     }
   }
 
+  const handleManualInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target
+    setManualData({ ...manualData, [id]: value })
+  }
+
   return (
     <div className="min-h-screen py-12 px-4">
       <div className="container mx-auto max-w-6xl">
@@ -161,64 +213,144 @@ export default function SolucaoPage() {
               Predição de Qualidade do Ar
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Utilize nossa IA para analisar dados atmosféricos em tempo real por localização.
+              Utilize nossa IA para analisar dados atmosféricos em tempo real por localização ou insira os
+              dados manualmente.
             </p>
           </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* --- Seção de Entrada de Dados --- */}
-          <Card className="border-2">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <MapPin className="h-6 w-6 text-primary" />
-                <span>Consultar por Localização</span>
+          {/* --- Seção de Entrada de Dados com Abas --- */}
+          <Card className="border-2 shadow-lg"> {/* Adicionado shadow-lg para destaque */}
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-t-lg p-6"> {/* Fundo para o header */}
+              <CardTitle className="flex items-center space-x-3 text-2xl font-bold text-blue-800">
+                <FileDigit className="h-8 w-8 text-blue-600" />
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+                  Entrada de Dados
+                </span>
               </CardTitle>
+              <p className="text-sm text-blue-700 mt-2">
+                Escolha entre consultar dados automáticos por localização ou inserir manualmente.
+              </p>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="cidade">Cidade</Label>
-                  <Input
-                    id="cidade"
-                    placeholder="Ex: Blumenau"
-                    value={locationData.cidade}
-                    onChange={(e) => setLocationData({ ...locationData, cidade: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="pais">País</Label>
-                  <Select
-                    value={locationData.pais}
-                    onValueChange={(value) => setLocationData({ ...locationData, pais: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o país" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Brasil">Brasil</SelectItem>
-                      <SelectItem value="Estados Unidos">Estados Unidos</SelectItem>
-                      <SelectItem value="Reino Unido">Reino Unido</SelectItem>
-                      <SelectItem value="Alemanha">Alemanha</SelectItem>
-                      <SelectItem value="França">França</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button onClick={handleLocationPrediction} className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Consultando...
-                    </>
-                  ) : (
-                    "Analisar Qualidade do Ar"
-                  )}
-                </Button>
-              </div>
+            <CardContent className="pt-6">
+              <Tabs defaultValue="location" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1 rounded-lg mb-4">
+                  <TabsTrigger value="location" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white transition-all">
+                    Por Localização
+                  </TabsTrigger>
+                  <TabsTrigger value="manual" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white transition-all">
+                    Dados Manuais
+                  </TabsTrigger>
+                </TabsList>
+
+                {/* --- Aba de Localização --- */}
+                <TabsContent value="location" className="pt-4">
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="cidade">Cidade</Label>
+                      <Input
+                        id="cidade"
+                        placeholder="Ex: Blumenau"
+                        value={locationData.cidade}
+                        onChange={(e) =>
+                          setLocationData({ ...locationData, cidade: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="pais">País</Label>
+                      <Select
+                        value={locationData.pais}
+                        onValueChange={(value) => setLocationData({ ...locationData, pais: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o país" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Brasil">Brasil</SelectItem>
+                          <SelectItem value="Estados Unidos">Estados Unidos</SelectItem>
+                          <SelectItem value="Reino Unido">Reino Unido</SelectItem>
+                          <SelectItem value="Alemanha">Alemanha</SelectItem>
+                          <SelectItem value="França">França</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button
+                      onClick={handleLocationPrediction}
+                      className="w-full"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Consultando...
+                        </>
+                      ) : (
+                        "Analisar por Localização"
+                      )}
+                    </Button>
+                  </div>
+                </TabsContent>
+
+                {/* --- Aba de Dados Manuais --- */}
+                <TabsContent value="manual" className="pt-4">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="Temperatura">Temperatura (°C)</Label>
+                        <Input id="Temperatura" type="number" value={manualData.Temperatura} onChange={handleManualInputChange} />
+                      </div>
+                      <div>
+                        <Label htmlFor="Umidade">Umidade (%)</Label>
+                        <Input id="Umidade" type="number" value={manualData.Umidade} onChange={handleManualInputChange} />
+                      </div>
+                      <div>
+                        <Label htmlFor="CO2">CO₂ (ppm)</Label>
+                        <Input id="CO2" type="number" value={manualData.CO2} onChange={handleManualInputChange} />
+                      </div>
+                      <div>
+                        <Label htmlFor="CO">CO (mg/m³)</Label>
+                        <Input id="CO" type="number" value={manualData.CO} onChange={handleManualInputChange} />
+                      </div>
+                       <div>
+                        <Label htmlFor="NO2">NO₂ (µg/m³)</Label>
+                        <Input id="NO2" type="number" value={manualData.NO2} onChange={handleManualInputChange} />
+                      </div>
+                      <div>
+                        <Label htmlFor="SO2">SO₂ (µg/m³)</Label>
+                        <Input id="SO2" type="number" value={manualData.SO2} onChange={handleManualInputChange} />
+                      </div>
+                      <div>
+                        <Label htmlFor="O3">O₃ (µg/m³)</Label>
+                        <Input id="O3" type="number" value={manualData.O3} onChange={handleManualInputChange} />
+                      </div>
+                      <div>
+                        <Label htmlFor="Pressao_Atm">Pressão (hPa)</Label>
+                        <Input id="Pressao_Atm" type="number" value={manualData.Pressao_Atm} onChange={handleManualInputChange} />
+                      </div>
+                    </div>
+                    <Button
+                      onClick={handleManualPrediction}
+                      className="w-full"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Analisando...
+                        </>
+                      ) : (
+                        "Analisar Dados Manuais"
+                      )}
+                    </Button>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
 
-          {/* --- Seção de Resultados --- */}
+          {/* --- Seção de Resultados (não muda) --- */}
           <Card className="border-2">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -243,22 +375,23 @@ export default function SolucaoPage() {
               {!isLoading && !error && !predictionResult && (
                 <div className="text-center py-12 text-muted-foreground">
                   <Wind className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p>Insira uma localização para obter a análise da qualidade do ar.</p>
+                  <p>Insira os dados para obter a análise da qualidade do ar.</p>
                 </div>
               )}
               {predictionResult && predictionResult.features_usadas && (
                 <div className="space-y-6">
-                  {/* --- Qualidade Geral --- */}
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
                     <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                      Qualidade do Ar em {predictionResult.cidade}
+                      Qualidade do Ar para{" "}
+                      {predictionResult.cidade === "Dados Manuais"
+                        ? "Análise Manual"
+                        : predictionResult.cidade}
                     </h3>
                     <Badge className={`text-xl px-6 py-2 mt-2 ${getQualityColor(predictionResult.label)}`}>
                       {predictionResult.label || "Indisponível"}
                     </Badge>
                   </div>
 
-                  {/* --- Visualização de Temperatura e Umidade --- */}
                   <div className="space-y-4">
                     <DataGauge
                       label="Temperatura"
@@ -278,7 +411,6 @@ export default function SolucaoPage() {
                     />
                   </div>
 
-                  {/* --- Análise de Fenômenos --- */}
                   <div>
                     <h4 className="font-semibold mb-3 text-center">Análise de Riscos</h4>
                     <div className="space-y-2">
@@ -314,12 +446,12 @@ export default function SolucaoPage() {
                     </div>
                   </div>
 
-                  {/* --- Demais Variáveis --- */}
                   <div>
                     <h4 className="font-semibold mb-3 text-center">Dados Coletados</h4>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-muted-foreground">
                       <p>
-                        <strong>Pressão:</strong> {predictionResult.features_usadas.Pressao_Atm.toFixed(1)} hPa
+                        <strong>Pressão:</strong>{" "}
+                        {predictionResult.features_usadas.Pressao_Atm.toFixed(1)} hPa
                       </p>
                       <p>
                         <strong>CO₂:</strong> {predictionResult.features_usadas.CO2.toFixed(1)} ppm
