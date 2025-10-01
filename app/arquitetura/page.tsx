@@ -1,6 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Brain, Database, Cloud, Server, Globe, Layers, Settings, BarChart3 } from "lucide-react"
+// Ícones atualizados
+import {
+  Brain,
+  Database,
+  Cloud,
+  Server,
+  Globe,
+  Layers,
+  Settings,
+  BarChart3,
+  Rocket,
+  Network,
+  Component,
+  Code,
+} from "lucide-react"
 
 export default function ArquiteturaPage() {
   const circularFlow = [
@@ -242,40 +256,41 @@ export default function ArquiteturaPage() {
             <CardTitle className="text-center text-2xl">Stack Tecnológico</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-4 gap-6 text-center">
-              <div className="space-y-2">
+            {/* Container alterado para flexbox para garantir o alinhamento central */}
+            <div className="flex flex-wrap justify-center gap-8 text-center">
+              <div className="space-y-2 w-40"> {/* Adicionado uma largura fixa para consistência */}
                 <Database className="h-12 w-12 mx-auto text-blue-500" />
                 <h4 className="font-semibold">Dados</h4>
                 <p className="text-sm text-muted-foreground">Datasets ambientais</p>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 w-40">
                 <Brain className="h-12 w-12 mx-auto text-purple-500" />
                 <h4 className="font-semibold">ML/IA</h4>
                 <p className="text-sm text-muted-foreground">Python, Scikit-learn, Random forest classifier</p>
               </div>
-              <div className="space-y-2">
-                <Server className="h-12 w-12 mx-auto text-orange-500" />
+              <div className="space-y-2 w-40">
+                <Code className="h-12 w-12 mx-auto text-orange-500" /> {/* Ícone alterado */}
                 <h4 className="font-semibold">Backend</h4>
                 <p className="text-sm text-muted-foreground">API REST, FastAPI</p>
               </div>
-              <div className="space-y-2">
-                <Server className="h-12 w-12 mx-auto text-orange-500" />
-                <h4 className="font-semibold">Backend</h4>
+              <div className="space-y-2 w-40">
+                <Rocket className="h-12 w-12 mx-auto text-red-500" /> {/* Ícone alterado */}
+                <h4 className="font-semibold">Deploy</h4>
                 <p className="text-sm text-muted-foreground">API Pública, Railway</p>
               </div>
-              <div className="space-y-2">
-                <Server className="h-12 w-12 mx-auto text-orange-500" />
-                <h4 className="font-semibold">Backend</h4>
-                <p className="text-sm text-muted-foreground">API Externa, OpenWeather</p>
+              <div className="space-y-2 w-40">
+                <Network className="h-12 w-12 mx-auto text-indigo-500" /> {/* Ícone alterado */}
+                <h4 className="font-semibold">API Externa</h4>
+                <p className="text-sm text-muted-foreground">OpenWeather</p>
               </div>
-              <div className="space-y-2">
-                <Globe className="h-12 w-12 mx-auto text-teal-500" />
+              <div className="space-y-2 w-40">
+                <Component className="h-12 w-12 mx-auto text-green-500" /> {/* Ícone alterado */}
                 <h4 className="font-semibold">Frontend</h4>
                 <p className="text-sm text-muted-foreground">React, Next.js, Tailwind CSS</p>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 w-40">
                 <Globe className="h-12 w-12 mx-auto text-teal-500" />
-                <h4 className="font-semibold">Frontend</h4>
+                <h4 className="font-semibold">Hospedagem</h4>
                 <p className="text-sm text-muted-foreground">Domínio publico, Vercel</p>
               </div>
             </div>
