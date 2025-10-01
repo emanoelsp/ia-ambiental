@@ -20,6 +20,7 @@ export default function PipelinePage() {
         "Conversão de váriávies (object → numérico)",
         "Criação de váriaveis para classificação de fenômenos",
         "Normalização/Escala dos dados",
+        "Balanceamento de dados"
       ],
       color: "bg-orange-500",
     },
@@ -27,7 +28,7 @@ export default function PipelinePage() {
       title: "Modelo de IA",
       icon: Brain,
       description: "Algoritmos de classificação para predição",
-      variables: ["Random Forest Classifier"],
+      variables: ["Separção de dados","Treino/Teste","Random Forest Classifier"],
       color: "bg-purple-500",
     },
     {
@@ -127,19 +128,19 @@ export default function PipelinePage() {
 
             <div className="grid md:grid-cols-3 gap-6 mt-6">
               <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">Chuva Ácida</h4>
+                <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2"> Probabilidade Chuva Ácida</h4>
                 <p className="text-sm text-blue-600 dark:text-blue-400">
                   Umidade elevada + concentrações altas de SO₂ e NO₂
                 </p>
               </div>
 
               <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-800">
-                <h4 className="font-semibold text-red-700 dark:text-red-300 mb-2">Fumaça Tóxica</h4>
+                <h4 className="font-semibold text-red-700 dark:text-red-300 mb-2"> Probabilidade Fumaça Tóxica</h4>
                 <p className="text-sm text-red-600 dark:text-red-400">Temperatura alta + presença de NO₂ e O₃</p>
               </div>
 
               <div className="p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
-                <h4 className="font-semibold text-orange-700 dark:text-orange-300 mb-2">Efeito Estufa</h4>
+                <h4 className="font-semibold text-orange-700 dark:text-orange-300 mb-2">Probabilidade Efeito Estufa</h4>
                 <p className="text-sm text-orange-600 dark:text-orange-400">
                   Concentrações elevadas de CO₂ e temperatura alta
                 </p>

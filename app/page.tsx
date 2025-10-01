@@ -62,10 +62,16 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+    <div className="container mx-auto max-w-4xl mt-10 px-4 border-t-10">
+        <h2 className="text-center text-3xl font-bold mt-12 mb-6 text-red-600">
+        Este conteúdo é destinado apenas para fins educacionais. Os dados exibidos são ilustrativos e podem não corresponder a situações reais.
+      </h2>
+      </div>
+
       </section>
 
       {/* Project Details */}
-      <section className="py-16 px-4">
+      <section className="py-10 px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-2 gap-8">
             {/* Academic Info */}

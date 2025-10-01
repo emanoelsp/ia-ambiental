@@ -9,7 +9,7 @@ export default function ArquiteturaPage() {
       title: "CRISP-DM Inicial",
       icon: Layers,
       description: "Metodologia inicial para entendimento do problema",
-      details: ["Business Understanding", "Definição de objetivos", "Compreensão do domínio"],
+      details: [],
       color: "bg-purple-500",
       position: { top: "10%", left: "50%" },
     },
@@ -18,34 +18,34 @@ export default function ArquiteturaPage() {
       title: "Dataset & Exploração",
       icon: Database,
       description: "Coleta e exploração inicial dos dados",
-      details: ["Dados históricos", "Análise exploratória", "Data Understanding"],
+      details: [],
       color: "bg-blue-500",
-      position: { top: "25%", left: "75%" },
+      position: { top: "25%", left: "80%" },
     },
     {
       id: 3,
       title: "Entendimento do Problema",
       icon: BarChart3,
       description: "Análise profunda do problema de qualidade do ar",
-      details: ["Análise de correlações", "Identificação de padrões", "Definição de features"],
+      details: [],
       color: "bg-indigo-500",
-      position: { top: "50%", left: "85%" },
+      position: { top: "50%", left: "90%" },
     },
     {
       id: 4,
       title: "Ajuste do Dataset",
       icon: Settings,
       description: "Preparação e limpeza dos dados",
-      details: ["Data Preparation", "Limpeza de dados", "Feature engineering"],
+      details: [],
       color: "bg-cyan-500",
-      position: { top: "75%", left: "75%" },
+      position: { top: "75%", left: "80%" },
     },
     {
       id: 5,
       title: "Treino do Modelo",
       icon: Brain,
       description: "Treinamento e validação do modelo de IA",
-      details: ["Modeling", "Treinamento", "Validação cruzada"],
+      details: [],
       color: "bg-green-500",
       position: { top: "90%", left: "50%" },
     },
@@ -54,27 +54,27 @@ export default function ArquiteturaPage() {
       title: "API de Predição",
       icon: Server,
       description: "Criação da API para inferência",
-      details: ["Deployment", "API REST", "Modelo em produção"],
+      details: [],
       color: "bg-orange-500",
-      position: { top: "75%", left: "25%" },
+      position: { top: "75%", left: "20%" },
     },
     {
       id: 7,
       title: "Recepção de Dados",
       icon: Cloud,
       description: "Recebe dados do frontend ou OpenWeather API",
-      details: ["Frontend input", "OpenWeather API", "Dados em tempo real"],
+      details: [],
       color: "bg-yellow-500",
-      position: { top: "50%", left: "15%" },
+      position: { top: "50%", left: "10%" },
     },
     {
       id: 8,
       title: "Retorno das Predições",
       icon: Globe,
       description: "Entrega dos resultados de predição",
-      details: ["Classificação", "Probabilidades", "Visualização"],
+      details: [],
       color: "bg-teal-500",
-      position: { top: "25%", left: "25%" },
+      position: { top: "25%", left: "20%" },
     },
   ]
 
@@ -121,32 +121,30 @@ export default function ArquiteturaPage() {
           </p>
         </div>
 
-        {/* Architecture Flow */}
+        {/* Seção da Topologia do Sistema */}
         <div className="mb-16">
-          <h2 className="text-3xl font-bold mb-8 text-center">Topologia Circular do Sistema</h2>
-          <div className="relative w-full h-[600px] mx-auto">
-            {/* Central circle */}
+
+          {/* ===== 1. VISUALIZAÇÃO PARA DESKTOP (Layout Circular) ===== */}
+          {/* Aparece apenas em telas grandes (lg) ou maiores */}
+          <div className="relative w-full h-[650px] mx-auto hidden lg:block">
+            {/* Círculo Central */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center shadow-lg">
               <Brain className="w-12 h-12 text-white" />
             </div>
 
-            {/* Circular flow components */}
+            {/* Componentes do Fluxo Circular */}
             {circularFlow.map((component, index) => {
               const Icon = component.icon
               const nextIndex = (index + 1) % circularFlow.length
               const nextComponent = circularFlow[nextIndex]
-
               return (
-                <div key={component.id}>
-                  {/* Component card */}
+                <div key={`desktop-${component.id}`}>
+                  {/* Card do Componente */}
                   <div
-                    className="absolute transform -translate-x-1/2 -translate-y-1/2 w-48"
-                    style={{
-                      top: component.position.top,
-                      left: component.position.left,
-                    }}
+                    className="absolute transform -translate-x-1/2 -translate-y-1/2 w-48 mt-4"
+                    style={{ top: component.position.top, left: component.position.left }}
                   >
-                    <Card className="border-2 hover:border-primary/50 transition-all hover:scale-105 shadow-lg">
+                    <Card className="border-2 bg-transparenthover:border-primary/50 transition-all hover:scale-105 shadow-lg">
                       <CardHeader className="pb-2">
                         <CardTitle className="flex items-center space-x-2 text-sm">
                           <div className={`p-2 rounded-lg ${component.color} text-white`}>
@@ -169,38 +167,48 @@ export default function ArquiteturaPage() {
                     </Card>
                   </div>
 
-                  {/* Curved arrows connecting components */}
+                  {/* Setas curvadas (SVG) */}
                   <svg className="absolute inset-0 pointer-events-none" style={{ width: "100%", height: "100%" }}>
                     <defs>
-                      <marker
-                        id={`arrowhead-${index}`}
-                        markerWidth="10"
-                        markerHeight="7"
-                        refX="9"
-                        refY="3.5"
-                        orient="auto"
-                      >
+                      <marker id={`arrowhead-${index}`} markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
                         <polygon points="0 0, 10 3.5, 0 7" fill="hsl(var(--primary))" />
                       </marker>
                     </defs>
                     <path
-                      d={`M ${Number.parseFloat(component.position.left)}% ${Number.parseFloat(component.position.top)}% 
+                      d={`M ${parseFloat(component.position.left)}% ${parseFloat(component.position.top)}% 
                           Q 50% 50% 
-                          ${Number.parseFloat(nextComponent.position.left)}% ${Number.parseFloat(nextComponent.position.top)}%`}
-                      stroke="hsl(var(--primary))"
-                      strokeWidth="2"
-                      fill="none"
-                      markerEnd={`url(#arrowhead-${index})`}
-                      opacity="0.6"
+                          ${parseFloat(nextComponent.position.left)}% ${parseFloat(nextComponent.position.top)}%`}
+                      stroke="hsl(var(--primary))" strokeWidth="2" fill="none" markerEnd={`url(#arrowhead-${index})`} opacity="0.6"
                     />
                   </svg>
                 </div>
               )
             })}
           </div>
+
+          {/* ===== 2. VISUALIZAÇÃO PARA CELULAR (Layout de Lista) ===== */}
+          {/* Aparece em telas pequenas e some a partir do breakpoint 'lg' */}
+          <div className="flex flex-col gap-4 lg:hidden">
+            {circularFlow.map(component => {
+              const Icon = component.icon
+              return (
+                <Card key={`mobile-${component.id}`} className="border-2 w-full">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-3 text-base">
+                      <div className={`p-2 rounded-lg ${component.color} text-white`}>
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <span className="font-semibold">{component.title}</span>
+                    </CardTitle>
+                  </CardHeader>
+                  {/* O CardContent não é renderizado aqui para simplificar a view mobile */}
+                </Card>
+              )
+            })}
+          </div>
         </div>
 
-        {/* CRISP-DM Details */}
+        {/* Seção CRISP-DM */}
         <div className="mb-12">
           <h2 className="text-3xl font-bold mb-8 text-center">Metodologia CRISP-DM</h2>
           <Card className="border-2">
@@ -228,7 +236,7 @@ export default function ArquiteturaPage() {
           </Card>
         </div>
 
-        {/* Technical Stack */}
+        {/* Seção Stack Tecnológico */}
         <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
           <CardHeader>
             <CardTitle className="text-center text-2xl">Stack Tecnológico</CardTitle>
@@ -238,22 +246,37 @@ export default function ArquiteturaPage() {
               <div className="space-y-2">
                 <Database className="h-12 w-12 mx-auto text-blue-500" />
                 <h4 className="font-semibold">Dados</h4>
-                <p className="text-sm text-muted-foreground">Datasets ambientais, OpenWeather API</p>
+                <p className="text-sm text-muted-foreground">Datasets ambientais</p>
               </div>
               <div className="space-y-2">
                 <Brain className="h-12 w-12 mx-auto text-purple-500" />
                 <h4 className="font-semibold">ML/IA</h4>
-                <p className="text-sm text-muted-foreground">Python, Scikit-learn, XGBoost</p>
+                <p className="text-sm text-muted-foreground">Python, Scikit-learn, Random forest classifier</p>
               </div>
               <div className="space-y-2">
                 <Server className="h-12 w-12 mx-auto text-orange-500" />
                 <h4 className="font-semibold">Backend</h4>
-                <p className="text-sm text-muted-foreground">API REST, FastAPI/Flask</p>
+                <p className="text-sm text-muted-foreground">API REST, FastAPI</p>
+              </div>
+              <div className="space-y-2">
+                <Server className="h-12 w-12 mx-auto text-orange-500" />
+                <h4 className="font-semibold">Backend</h4>
+                <p className="text-sm text-muted-foreground">API Pública, Railway</p>
+              </div>
+              <div className="space-y-2">
+                <Server className="h-12 w-12 mx-auto text-orange-500" />
+                <h4 className="font-semibold">Backend</h4>
+                <p className="text-sm text-muted-foreground">API Externa, OpenWeather</p>
               </div>
               <div className="space-y-2">
                 <Globe className="h-12 w-12 mx-auto text-teal-500" />
                 <h4 className="font-semibold">Frontend</h4>
                 <p className="text-sm text-muted-foreground">React, Next.js, Tailwind CSS</p>
+              </div>
+              <div className="space-y-2">
+                <Globe className="h-12 w-12 mx-auto text-teal-500" />
+                <h4 className="font-semibold">Frontend</h4>
+                <p className="text-sm text-muted-foreground">Domínio publico, Vercel</p>
               </div>
             </div>
           </CardContent>
