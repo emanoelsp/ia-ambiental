@@ -2,12 +2,15 @@
 
 Este projeto é destinado apenas para fins educacionais. Os dados exibidos são apenas ilustrativos e podem não corresponder a situações reais.
 
+---
+
 # IA Ambiental - Previsão de Qualidade do Ar
 
 Este projeto consiste em uma aplicação web que utiliza um modelo de Machine Learning para prever a qualidade do ar com base em dados ambientais. A solução possui duas formas de interação: fornecendo os dados manualmente ou informando uma localidade para que os dados sejam coletados em tempo real de uma API externa.
 
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://ia-ambiental.vercel.app/solucao)
 [![API on Railway](https://img.shields.io/badge/API%20on-Railway-blueviolet?style=for-the-badge&logo=railway)](https://web-production-b320.up.railway.app/docs)
+[![OpenWeatherMap](https://img.shields.io/badge/API-OpenWeatherMap-orange?style=for-the-badge&logo=openweathermap)](https://openweathermap.org/api)
 
 ---
 
@@ -49,14 +52,13 @@ Siga os passos abaixo para clonar, instalar as dependências e executar o projet
 ### Pré-requisitos
 
 * [Git](https://git-scm.com/)
-* [Python](https://www.python.org/downloads/) (versão 3.8 ou superior recomendada)
-* `pip` (geralmente instalado com o Python)
+* [NodeJS](https://nodejs.org/)
 
-### Instalação e Execução
+### Instalação e Execução Local
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/emanoelsp/desfinal-aprendizagemdemaquina.git](https://github.com/emanoelsp/desfinal-aprendizagemdemaquina.git)
+    git clone https://github.com/emanoelsp/desfinal-aprendizagemdemaquina.git
     ```
 
 2.  **Navegue até o diretório do projeto:**
@@ -64,46 +66,72 @@ Siga os passos abaixo para clonar, instalar as dependências e executar o projet
     cd desfinal-aprendizagemdemaquina
     ```
 
-3.  **(Opcional, mas recomendado) Crie e ative um ambiente virtual:**
-    * No Windows:
+3.  **Instale as dependências:**
         ```bash
-        python -m venv venv
-        .\venv\Scripts\activate
-        ```
-    * No macOS/Linux:
-        ```bash
-        python3 -m venv venv
-        source venv/bin/activate
+        npm install
         ```
 
-4.  **Instale as dependências necessárias:**
+5.  **Executar o projeto localmente:**
     ```bash
-    pip install -r requirements.txt
+    npm run dev
     ```
-
-5.  **Execute a aplicação (API):**
-    O servidor será iniciado, e a API estará pronta para receber requisições.
+ O servidor será iniciado, e a aplicação estará pronta para enviar as requisições.
+ 
+6.  **Acessar a aplicacao:**
     ```bash
-    uvicorn main:app --reload
+    https://localhost:3000
     ```
-    Por padrão, a API estará acessível em `http://127.0.0.1:8000`.
-
 ---
 
 ## Testando a API de Predição
 
 Abaixo estão exemplos de como interagir com os principais endpoints da API usando uma ferramenta como o [Insomnia](https://insomnia.rest/), [Postman](https://www.postman.com/) ou `curl`.
 
+#### Endereço da api:
+https://web-production-b320.up.railway.app/
+
+---
+
 ### Endpoint: `GET /`
 
-Verifica se a API está funcionando corretamente.
+Este é o endpoint raiz da API. Ele serve como um "health check" para verificar o status da aplicação, confirmando que ela está online, que o modelo de Machine Learning foi carregado corretamente e qual a versão atual.
 
-**Exemplo de Resposta:**
+**Exemplo de Requisição:**
 
 ```json
+GET https://web-production-b320.up.railway.app/
+ ```
+
+### Endpoint: `POST /predict/variaveis`
+
+Este endpoint realiza a predição da qualidade do ar com base em um conjunto de variáveis ambientais fornecidas diretamente no corpo da requisição. É o método utilizado quando o usuário insere os dados manualmente no formulário.
+
+**Corpo da Requisição (Body - JSON):**
+É necessário enviar um objeto JSON com as seguintes chaves e valores numéricos:
+
+```json
+
+POST https://web-production-b320.up.railway.app/predict/variaveis
+
 {
-  "ok": true,
-  "model_loaded": true,
-  "model_path": "models/model.pkl",
-  "version": "1.0.0"
+    "Temperatura": 10, "Umidade": 10, "CO2": 0, "CO": 0,
+    "Pressao_Atm": 10, "NO2": 10, "SO2": 10, "O3": 10
 }
+```
+
+### Endpoint: `POST /predict/local`
+
+Este endpoint realiza a predição da qualidade do ar com base em uma localidade (cidade e país). Ele consulta a API externa (OpenWeatherMap) para obter os dados ambientais daquele local em tempo real e, em seguida, utiliza o modelo de Machine Learning para fazer a previsão.
+
+**Corpo da Requisição (Body - JSON):**
+É necessário enviar um objeto JSON com o nome da cidade e do país.
+
+```json
+
+POST https://web-production-b320.up.railway.app/predict/local
+
+{
+  "cidade": "Gaspar",
+  "pais": "BRASIL"
+}
+```
