@@ -453,11 +453,11 @@ import {
   Loader2,
   AlertTriangle,
   FileDigit,
-  Droplets,
-  Gauge,
+  Droplets, // Ícone para Umidade
+  Gauge, // Ícone para Pressão
 } from "lucide-react"
 
-// Componente para a visualização gráfica (sem alterações)
+// --- Componente para a visualização gráfica (atualizado com ícone) ---
 const DataGauge = ({
   label,
   value,
@@ -473,9 +473,10 @@ const DataGauge = ({
   min: number
   max: number
   colorClass: string
-  icon: React.ReactNode
+  icon: React.ReactNode // Prop para o ícone
 }) => {
   const percentage = Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100))
+
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-1 text-sm">
@@ -495,6 +496,7 @@ const DataGauge = ({
 }
 
 export default function SolucaoPage() {
+  // --- Estados ---
   const [predictionResult, setPredictionResult] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -513,7 +515,7 @@ export default function SolucaoPage() {
     pais: "Brasil",
   })
 
-  // Função de chamada à API por localização (sem alterações)
+  // --- Função de chamada à API por localização ---
   const handleLocationPrediction = async () => {
     if (!locationData.cidade || !locationData.pais) {
       setError("Por favor, preencha a cidade e o país.")
@@ -526,15 +528,19 @@ export default function SolucaoPage() {
     try {
       const response = await fetch("https://web-production-b320.up.railway.app/predict/local", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           cidade: locationData.cidade,
           pais: locationData.pais,
         }),
       })
+
       if (!response.ok) {
         throw new Error(`Erro na comunicação com o servidor: ${response.statusText}`)
       }
+
       const result = await response.json()
       setPredictionResult(result)
     } catch (err: any) {
@@ -547,7 +553,7 @@ export default function SolucaoPage() {
     }
   }
 
-  // --- ATUALIZADO: Função de predição com dados manuais ---
+  // --- Função de predição com dados manuais via API ---
   const handleManualPrediction = async () => {
     const isInvalid = Object.values(manualData).some(
       (value) => value === "" || isNaN(parseFloat(value))
@@ -561,11 +567,12 @@ export default function SolucaoPage() {
     setError(null)
     setPredictionResult(null)
 
+    // Converte os dados manuais para números
     const numericData = Object.fromEntries(
       Object.entries(manualData).map(([key, value]) => [key, parseFloat(value)])
     )
 
-    // 1. O payload agora é aninhado dentro de um objeto "features"
+    // O payload é ajustado para o formato que a API espera: { "features": { ... } }
     const payload = {
       features: numericData,
     }
@@ -588,23 +595,22 @@ export default function SolucaoPage() {
 
       const apiResult = await response.json()
 
-      // 2. Função para mapear "Sim"/"Não" da API para os níveis de risco da UI
+      // A resposta da API é processada para o formato que a UI já usa
       const mapSimNaoToRisk = (value: string) => {
         if (value.toLowerCase() === "sim") return "Alto"
         if (value.toLowerCase() === "não") return "Baixo"
-        return "Indisponível" // Fallback para casos inesperados
+        return "Indisponível"
       }
 
-      // 3. Monta o objeto de resultado no formato esperado pela interface
+      // Monta o objeto de resultado no formato esperado pela interface
       const finalResult = {
         cidade: "Dados Manuais",
         features_usadas: numericData,
         qualidade_ambiental: {
-          prediction: null, // A API não retorna um prediction numérico, mantemos a estrutura
+          prediction: null,
           label: apiResult.prediction.Qualidade_Ambiental,
         },
         risco_chuva_acida: mapSimNaoToRisk(apiResult.prediction.Risco_Chuva_Acida),
-        // A UI usa "Fumaça Tóxica", a API retorna "Smog_Fotoquimico". Mapeamos aqui.
         fumaca_toxica: mapSimNaoToRisk(apiResult.prediction.Risco_Smog_Fotoquimico),
         risco_efeito_estufa: mapSimNaoToRisk(apiResult.prediction.Risco_Efeito_Estufa),
       }
@@ -618,14 +624,18 @@ export default function SolucaoPage() {
     }
   }
 
-  // Funções de estilo (sem alterações)
+  // --- Funções de estilo ---
   const getRiskColor = (risco: string) => {
     if (!risco) return "text-gray-600 bg-gray-100"
     switch (risco.toLowerCase()) {
-      case "baixo": return "text-green-600 bg-green-100"
-      case "moderado": return "text-yellow-600 bg-yellow-100"
-      case "alto": return "text-red-600 bg-red-100"
-      default: return "text-gray-600 bg-gray-100"
+      case "baixo":
+        return "text-green-600 bg-green-100"
+      case "moderado":
+        return "text-yellow-600 bg-yellow-100"
+      case "alto":
+        return "text-red-600 bg-red-100"
+      default:
+        return "text-gray-600 bg-gray-100"
     }
   }
 
@@ -633,12 +643,17 @@ export default function SolucaoPage() {
     if (!qualidade) return "text-gray-600 bg-gray-100"
     switch (qualidade.toLowerCase()) {
       case "excelente":
-      case "boa": return "text-green-600 bg-green-100"
-      case "moderada": return "text-yellow-600 bg-yellow-100"
-      case "ruim": return "text-orange-600 bg-orange-100"
+      case "boa":
+        return "text-green-600 bg-green-100"
+      case "moderada":
+        return "text-yellow-600 bg-yellow-100"
+      case "ruim":
+        return "text-orange-600 bg-orange-100"
       case "muito ruim":
-      case "péssima": return "text-red-600 bg-red-100"
-      default: return "text-gray-600 bg-gray-100"
+      case "péssima":
+        return "text-red-600 bg-red-100"
+      default:
+        return "text-gray-600 bg-gray-100"
     }
   }
 
@@ -647,7 +662,6 @@ export default function SolucaoPage() {
     setManualData({ ...manualData, [id]: value })
   }
 
-  // O restante do JSX permanece o mesmo
   return (
     <div className="min-h-screen py-12 px-4">
       <div className="container mx-auto max-w-6xl">
@@ -772,7 +786,7 @@ export default function SolucaoPage() {
               
               {predictionResult && predictionResult.features_usadas && (
                 <div className="space-y-6">
-                  {/* Bloco de Qualidade do Ar */}
+                  {/* Bloco de Qualidade do Ar (sempre exibido) */}
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
                     <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                       Qualidade do Ar para{" "}
@@ -785,16 +799,34 @@ export default function SolucaoPage() {
                     </Badge>
                   </div>
 
-                  {/* Bloco de Medidores (só para localização) */}
+                  {/* ATUALIZADO: Bloco de Medidores (Temperatura, etc.) SÓ APARECE para consulta por localidade */}
                   {predictionResult.cidade !== "Dados Manuais" && (
                     <div className="space-y-4">
-                      <DataGauge label="Temperatura" icon={<Thermometer className="h-4 w-4 text-red-500" />} value={predictionResult.features_usadas.Temperatura} unit="°C" min={-10} max={40} colorClass="bg-gradient-to-r from-yellow-400 to-red-500"/>
-                      <DataGauge label="Umidade" icon={<Droplets className="h-4 w-4 text-blue-500" />} value={predictionResult.features_usadas.Umidade} unit="%" min={0} max={100} colorClass="bg-gradient-to-r from-cyan-400 to-blue-500"/>
-                      <DataGauge label="Pressão" icon={<Gauge className="h-4 w-4 text-gray-500" />} value={predictionResult.features_usadas.Pressao_Atm} unit="hPa" min={980} max={1050} colorClass="bg-gradient-to-r from-gray-400 to-gray-600"/>
+                      <DataGauge
+                        label="Temperatura"
+                        icon={<Thermometer className="h-4 w-4 text-red-500" />}
+                        value={predictionResult.features_usadas.Temperatura}
+                        unit="°C" min={-10} max={40}
+                        colorClass="bg-gradient-to-r from-yellow-400 to-red-500"
+                      />
+                      <DataGauge
+                        label="Umidade"
+                        icon={<Droplets className="h-4 w-4 text-blue-500" />}
+                        value={predictionResult.features_usadas.Umidade}
+                        unit="%" min={0} max={100}
+                        colorClass="bg-gradient-to-r from-cyan-400 to-blue-500"
+                      />
+                      <DataGauge
+                        label="Pressão"
+                        icon={<Gauge className="h-4 w-4 text-gray-500" />}
+                        value={predictionResult.features_usadas.Pressao_Atm}
+                        unit="hPa" min={980} max={1050}
+                        colorClass="bg-gradient-to-r from-gray-400 to-gray-600"
+                      />
                     </div>
                   )}
 
-                  {/* Bloco de Análise de Riscos */}
+                  {/* Bloco de Análise de Riscos (sempre exibido) */}
                   <div>
                     <h4 className="font-semibold mb-3 text-center">Análise de Riscos</h4>
                     <div className="space-y-2">
@@ -813,7 +845,7 @@ export default function SolucaoPage() {
                     </div>
                   </div>
 
-                  {/* Bloco de Dados Coletados (só para localização) */}
+                  {/* ATUALIZADO: Bloco de Dados Coletados SÓ APARECE para consulta por localidade */}
                   {predictionResult.cidade !== "Dados Manuais" && (
                     <div>
                       <h4 className="font-semibold mb-3 text-center">Dados Coletados</h4>
