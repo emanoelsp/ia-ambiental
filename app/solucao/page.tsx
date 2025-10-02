@@ -123,11 +123,11 @@ export default function SolucaoPage() {
     }
   }
 
-  // --- Função de predição com dados manuais (simulada) ---
+  // --- Função de predição com dados manuais via API ---
   const handleManualPrediction = async () => {
-    const isInvalid = Object.values(manualData).some((value) => value === "")
+    const isInvalid = Object.values(manualData).some((value) => value === "" || isNaN(parseFloat(value)))
     if (isInvalid) {
-      setError("Por favor, preencha todos os campos manuais.")
+      setError("Por favor, preencha todos os campos com valores numéricos.")
       return
     }
 
@@ -135,40 +135,53 @@ export default function SolucaoPage() {
     setError(null)
     setPredictionResult(null)
 
-    // Simula uma chamada de API
-    setTimeout(() => {
-      const features = {
-        Temperatura: parseFloat(manualData.Temperatura),
-        Umidade: parseFloat(manualData.Umidade),
-        CO2: parseFloat(manualData.CO2),
-        CO: parseFloat(manualData.CO),
-        Pressao_Atm: parseFloat(manualData.Pressao_Atm),
-        NO2: parseFloat(manualData.NO2),
-        SO2: parseFloat(manualData.SO2),
-        O3: parseFloat(manualData.O3),
+    // Converte os dados manuais para números
+    const payload = Object.fromEntries(
+      Object.entries(manualData).map(([key, value]) => [key, parseFloat(value)])
+    )
+
+    try {
+      const response = await fetch("https://web-production-b320.up.railway.app/predict/variaveis", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Erro na comunicação com o servidor: ${response.statusText}`)
       }
 
-      // Lógica de simulação simples para o resultado
-      let label = "Boa"
-      if (features.CO2 > 800 || features.NO2 > 60 || features.O3 > 120) {
-        label = "Ruim"
-      } else if (features.CO2 > 500 || features.NO2 > 30 || features.O3 > 70) {
-        label = "Moderada"
+      const apiResult = await response.json()
+
+      // Função para mapear a probabilidade para o risco
+      const mapProbaToRisk = (value: number) => {
+        if (value < 1) return "Baixo"
+        if (value >= 1 && value <= 2) return "Moderado"
+        return "Alto"
       }
 
-      const mockResult = {
+      // Monta o objeto de resultado no formato esperado pela interface
+      const finalResult = {
         cidade: "Dados Manuais",
-        pais: "",
-        features_usadas: features,
-        risco_chuva_acida: features.SO2 > 50 ? "Alto" : "Baixo",
-        fumaca_toxica: features.CO > 2 ? "Moderado" : "Baixo",
-        risco_efeito_estufa: features.CO2 > 700 ? "Alto" : "Moderado",
-        // Atualizado para corresponder à nova estrutura da API
-        qualidade_ambiental: { prediction: null, label: label },
+        features_usadas: payload, // Necessário para o render condicional
+        qualidade_ambiental: {
+          prediction: apiResult.prediction,
+          label: apiResult.label,
+        },
+        risco_chuva_acida: mapProbaToRisk(apiResult.proba[0]),
+        fumaca_toxica: mapProbaToRisk(apiResult.proba[1]),
+        risco_efeito_estufa: mapProbaToRisk(apiResult.proba[2]),
       }
-      setPredictionResult(mockResult)
+
+      setPredictionResult(finalResult)
+    } catch (err: any) {
+      console.error("Falha ao buscar predição manual:", err)
+      setError("Não foi possível obter a predição. Verifique os valores e tente novamente.")
+    } finally {
       setIsLoading(false)
-    }, 1500)
+    }
   }
 
   // --- Funções de estilo ---
@@ -276,7 +289,38 @@ export default function SolucaoPage() {
                 <TabsContent value="manual" className="pt-4">
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
-                      {/* Inputs manuais... */}
+                       <div>
+                        <Label htmlFor="Temperatura">Temperatura (°C)</Label>
+                        <Input id="Temperatura" type="number" value={manualData.Temperatura} onChange={handleManualInputChange} />
+                      </div>
+                      <div>
+                        <Label htmlFor="Umidade">Umidade (%)</Label>
+                        <Input id="Umidade" type="number" value={manualData.Umidade} onChange={handleManualInputChange} />
+                      </div>
+                      <div>
+                        <Label htmlFor="CO2">CO₂ (ppm)</Label>
+                        <Input id="CO2" type="number" value={manualData.CO2} onChange={handleManualInputChange} />
+                      </div>
+                      <div>
+                        <Label htmlFor="CO">CO (mg/m³)</Label>
+                        <Input id="CO" type="number" value={manualData.CO} onChange={handleManualInputChange} />
+                      </div>
+                       <div>
+                        <Label htmlFor="NO2">NO₂ (µg/m³)</Label>
+                        <Input id="NO2" type="number" value={manualData.NO2} onChange={handleManualInputChange} />
+                      </div>
+                      <div>
+                        <Label htmlFor="SO2">SO₂ (µg/m³)</Label>
+                        <Input id="SO2" type="number" value={manualData.SO2} onChange={handleManualInputChange} />
+                      </div>
+                      <div>
+                        <Label htmlFor="O3">O₃ (µg/m³)</Label>
+                        <Input id="O3" type="number" value={manualData.O3} onChange={handleManualInputChange} />
+                      </div>
+                      <div>
+                        <Label htmlFor="Pressao_Atm">Pressão (hPa)</Label>
+                        <Input id="Pressao_Atm" type="number" value={manualData.Pressao_Atm} onChange={handleManualInputChange} />
+                      </div>
                     </div>
                     <Button onClick={handleManualPrediction} className="w-full" disabled={isLoading}>
                       {isLoading ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Analisando...</>) : ("Analisar Dados Manuais")}
@@ -299,8 +343,10 @@ export default function SolucaoPage() {
               {isLoading && (<div className="text-center py-12 text-muted-foreground"><Loader2 className="h-16 w-16 mx-auto mb-4 animate-spin opacity-50" /><p>Buscando e processando dados...</p></div>)}
               {error && (<div className="text-center py-12 text-red-600 bg-red-50 p-4 rounded-lg"><AlertTriangle className="h-12 w-12 mx-auto mb-4" /><p className="font-semibold">Ocorreu um Erro</p><p className="text-sm">{error}</p></div>)}
               {!isLoading && !error && !predictionResult && (<div className="text-center py-12 text-muted-foreground"><Wind className="h-16 w-16 mx-auto mb-4 opacity-50" /><p>Insira os dados para obter a análise da qualidade do ar.</p></div>)}
+              
               {predictionResult && predictionResult.features_usadas && (
                 <div className="space-y-6">
+                  {/* Bloco de Qualidade do Ar (sempre exibido) */}
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
                     <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                       Qualidade do Ar para{" "}
@@ -308,37 +354,39 @@ export default function SolucaoPage() {
                         ? "Análise Manual"
                         : predictionResult.cidade}
                     </h3>
-                    {/* ATUALIZADO para usar a nova estrutura da API */}
                     <Badge className={`text-xl px-6 py-2 mt-2 ${getQualityColor(predictionResult.qualidade_ambiental?.label)}`}>
                       {predictionResult.qualidade_ambiental?.label || "Indisponível"}
                     </Badge>
                   </div>
 
-                  {/* ATUALIZADO com Pressão Atmosférica e ícones */}
-                  <div className="space-y-4">
-                    <DataGauge
-                      label="Temperatura"
-                      icon={<Thermometer className="h-4 w-4 text-red-500" />}
-                      value={predictionResult.features_usadas.Temperatura}
-                      unit="°C" min={-10} max={40}
-                      colorClass="bg-gradient-to-r from-yellow-400 to-red-500"
-                    />
-                    <DataGauge
-                      label="Umidade"
-                      icon={<Droplets className="h-4 w-4 text-blue-500" />}
-                      value={predictionResult.features_usadas.Umidade}
-                      unit="%" min={0} max={100}
-                      colorClass="bg-gradient-to-r from-cyan-400 to-blue-500"
-                    />
-                    <DataGauge
-                      label="Pressão"
-                      icon={<Gauge className="h-4 w-4 text-gray-500" />}
-                      value={predictionResult.features_usadas.Pressao_Atm}
-                      unit="hPa" min={980} max={1050}
-                      colorClass="bg-gradient-to-r from-gray-400 to-gray-600"
-                    />
-                  </div>
+                  {/* ATUALIZADO: Bloco de Medidores (Temperatura, etc.) SÓ APARECE para consulta por localidade */}
+                  {predictionResult.cidade !== "Dados Manuais" && (
+                    <div className="space-y-4">
+                      <DataGauge
+                        label="Temperatura"
+                        icon={<Thermometer className="h-4 w-4 text-red-500" />}
+                        value={predictionResult.features_usadas.Temperatura}
+                        unit="°C" min={-10} max={40}
+                        colorClass="bg-gradient-to-r from-yellow-400 to-red-500"
+                      />
+                      <DataGauge
+                        label="Umidade"
+                        icon={<Droplets className="h-4 w-4 text-blue-500" />}
+                        value={predictionResult.features_usadas.Umidade}
+                        unit="%" min={0} max={100}
+                        colorClass="bg-gradient-to-r from-cyan-400 to-blue-500"
+                      />
+                      <DataGauge
+                        label="Pressão"
+                        icon={<Gauge className="h-4 w-4 text-gray-500" />}
+                        value={predictionResult.features_usadas.Pressao_Atm}
+                        unit="hPa" min={980} max={1050}
+                        colorClass="bg-gradient-to-r from-gray-400 to-gray-600"
+                      />
+                    </div>
+                  )}
 
+                  {/* Bloco de Análise de Riscos (sempre exibido) */}
                   <div>
                     <h4 className="font-semibold mb-3 text-center">Análise de Riscos</h4>
                     <div className="space-y-2">
@@ -357,16 +405,19 @@ export default function SolucaoPage() {
                     </div>
                   </div>
 
-                  <div>
-                    <h4 className="font-semibold mb-3 text-center">Dados Coletados</h4>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-muted-foreground">
-                      <p><strong>CO₂:</strong> {predictionResult.features_usadas.CO2.toFixed(1)} ppm</p>
-                      <p><strong>CO:</strong> {predictionResult.features_usadas.CO.toFixed(3)} mg/m³</p>
-                      <p><strong>NO₂:</strong> {predictionResult.features_usadas.NO2.toFixed(3)} µg/m³</p>
-                      <p><strong>SO₂:</strong> {predictionResult.features_usadas.SO2.toFixed(3)} µg/m³</p>
-                      <p><strong>O₃:</strong> {predictionResult.features_usadas.O3.toFixed(3)} µg/m³</p>
+                  {/* ATUALIZADO: Bloco de Dados Coletados SÓ APARECE para consulta por localidade */}
+                  {predictionResult.cidade !== "Dados Manuais" && (
+                    <div>
+                      <h4 className="font-semibold mb-3 text-center">Dados Coletados</h4>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-muted-foreground">
+                        <p><strong>CO₂:</strong> {predictionResult.features_usadas.CO2.toFixed(1)} ppm</p>
+                        <p><strong>CO:</strong> {predictionResult.features_usadas.CO.toFixed(3)} mg/m³</p>
+                        <p><strong>NO₂:</strong> {predictionResult.features_usadas.NO2.toFixed(3)} µg/m³</p>
+                        <p><strong>SO₂:</strong> {predictionResult.features_usadas.SO2.toFixed(3)} µg/m³</p>
+                        <p><strong>O₃:</strong> {predictionResult.features_usadas.O3.toFixed(3)} µg/m³</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
             </CardContent>
