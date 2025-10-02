@@ -431,240 +431,229 @@
 "use client"
 
 import { useState } from "react"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 import {
-  Thermometer,
-  Wind,
-  Brain,
-  CloudRain,
-  Skull,
-  Loader2,
-  AlertTriangle,
-  FileDigit,
-  Droplets, // Ícone para Umidade
-  Gauge, // Ícone para Pressão
+  Thermometer,
+  Wind,
+  Brain,
+  CloudRain,
+  Skull,
+  Loader2,
+  AlertTriangle,
+  FileDigit,
+  Droplets,
+  Gauge,
 } from "lucide-react"
 
-// --- Componente para a visualização gráfica (atualizado com ícone) ---
 const DataGauge = ({
-  label,
-  value,
-  unit,
-  min,
-  max,
-  colorClass,
-  icon,
+  label,
+  value,
+  unit,
+  min,
+  max,
+  colorClass,
+  icon,
 }: {
-  label: string
-  value: number
-  unit: string
-  min: number
-  max: number
-  colorClass: string
-  icon: React.ReactNode // Prop para o ícone
+  label: string
+  value: number
+  unit: string
+  min: number
+  max: number
+  colorClass: string
+  icon: React.ReactNode
 }) => {
-  const percentage = Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100))
+  const percentage = Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100))
 
-  return (
-    <div className="w-full">
-      <div className="flex justify-between items-center mb-1 text-sm">
-        <div className="flex items-center space-x-2">
-          {icon}
-          <span className="font-medium text-muted-foreground">{label}</span>
-        </div>
-        <span className="font-bold">
-          {value.toFixed(1)} {unit}
-        </span>
-      </div>
-      <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
-        <div className={`h-3 rounded-full ${colorClass}`} style={{ width: `${percentage}%` }} />
-      </div>
-    </div>
-  )
+  return (
+    <div className="w-full">
+      <div className="flex justify-between items-center mb-1 text-sm">
+        <div className="flex items-center space-x-2">
+          {icon}
+          <span className="font-medium text-muted-foreground">{label}</span>
+        </div>
+        <span className="font-bold">
+          {value.toFixed(1)} {unit}
+        </span>
+      </div>
+      <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
+        <div className={`h-3 rounded-full ${colorClass}`} style={{ width: `${percentage}%` }} />
+      </div>
+    </div>
+  )
 }
 
 export default function SolucaoPage() {
-  // --- Estados ---
-  const [predictionResult, setPredictionResult] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [manualData, setManualData] = useState({
-    Temperatura: "28",
-    Umidade: "85",
-    CO2: "900",
-    CO: "2.5",
-    Pressao_Atm: "1010",
-    NO2: "80",
-    SO2: "55",
-    O3: "150",
-  })
-  const [locationData, setLocationData] = useState({
-    cidade: "",
-    pais: "Brasil",
-  })
+  const [predictionResult, setPredictionResult] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  // --- Função de chamada à API por localização ---
-  const handleLocationPrediction = async () => {
-    if (!locationData.cidade || !locationData.pais) {
-      setError("Por favor, preencha a cidade e o país.")
-      return
-    }
-    setIsLoading(true)
-    setError(null)
-    setPredictionResult(null)
+  const [manualData, setManualData] = useState({
+    Temperatura: "28",
+    Umidade: "85",
+    CO2: "900",
+    CO: "2.5",
+    Pressao_Atm: "1010",
+    NO2: "80",
+    SO2: "55",
+    O3: "150",
+  })
 
-    try {
-      const response = await fetch("https://web-production-b320.up.railway.app/predict/local", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          cidade: locationData.cidade,
-          pais: locationData.pais,
-        }),
-      })
+  const [locationData, setLocationData] = useState({
+    cidade: "",
+    pais: "Brasil",
+  })
 
-      if (!response.ok) {
-        throw new Error(`Erro na comunicação com o servidor: ${response.statusText}`)
-      }
+  const handleLocationPrediction = async () => {
+    if (!locationData.cidade || !locationData.pais) {
+      setError("Por favor, preencha a cidade e o país.")
+      return
+    }
+    setIsLoading(true)
+    setError(null)
+    setPredictionResult(null)
 
-      const result = await response.json()
-      setPredictionResult(result)
-    } catch (err: any) {
-      console.error("Falha ao buscar predição:", err)
-      setError(
-        "Não foi possível obter os dados. Verifique a cidade e tente novamente. (A API pode não ter dados para o local exato)"
-      )
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    try {
+      const response = await fetch("https://web-production-b320.up.railway.app/predict/local", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cidade: locationData.cidade,
+          pais: locationData.pais,
+        }),
+      })
 
-  // --- Função de predição com dados manuais via API ---
-  const handleManualPrediction = async () => {
-    const isInvalid = Object.values(manualData).some(
-      (value) => value === "" || isNaN(parseFloat(value))
-    )
-    if (isInvalid) {
-      setError("Por favor, preencha todos os campos com valores numéricos.")
-      return
-    }
+      if (!response.ok) {
+        throw new Error(`Erro na comunicação com o servidor: ${response.statusText}`)
+      }
 
-    setIsLoading(true)
-    setError(null)
-    setPredictionResult(null)
+      const result = await response.json()
+      setPredictionResult(result)
+    } catch (err: any) {
+      console.error("Falha ao buscar predição:", err)
+      setError(
+        "Não foi possível obter os dados. Verifique a cidade e tente novamente. (A API pode não ter dados para o local exato)"
+      )
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
-    // Converte os dados manuais para números
-    const numericData = Object.fromEntries(
-      Object.entries(manualData).map(([key, value]) => [key, parseFloat(value)])
-    )
+  // ✅ FUNÇÃO MANUAL COM API ATUALIZADA
+  const handleManualPrediction = async () => {
+    const isInvalid = Object.values(manualData).some(
+      (value) => value === "" || isNaN(parseFloat(value))
+    )
+    if (isInvalid) {
+      setError("Por favor, preencha todos os campos com valores numéricos.")
+      return
+    }
 
-    // O payload é ajustado para o formato que a API espera: { "features": { ... } }
-    const payload = {
-      features: numericData,
-    }
+    setIsLoading(true)
+    setError(null)
+    setPredictionResult(null)
 
-    try {
-      const response = await fetch(
-        "https://projetoqualidadeambientalfinal-production.up.railway.app/predict-features",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      )
+    const featuresPayload = Object.fromEntries(
+      Object.entries(manualData).map(([key, value]) => [key, parseFloat(value)])
+    )
 
-      if (!response.ok) {
-        throw new Error(`Erro na comunicação com o servidor: ${response.statusText}`)
-      }
+    try {
+      const response = await fetch(
+        "https://projetoqualidadeambientalfinal-production.up.railway.app/predict-features",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ features: featuresPayload }),
+        }
+      )
 
-      const apiResult = await response.json()
+      if (!response.ok) {
+        throw new Error(`Erro na comunicação com o servidor: ${response.statusText}`)
+      }
 
-      // A resposta da API é processada para o formato que a UI já usa
-      const mapSimNaoToRisk = (value: string) => {
-        if (value.toLowerCase() === "sim") return "Alto"
-        if (value.toLowerCase() === "não") return "Baixo"
-        return "Indisponível"
-      }
+      const apiResult = await response.json()
 
-      // Monta o objeto de resultado no formato esperado pela interface
-      const finalResult = {
-        cidade: "Dados Manuais",
-        features_usadas: numericData,
-        qualidade_ambiental: {
-          prediction: null,
-          label: apiResult.prediction.Qualidade_Ambiental,
-        },
-        risco_chuva_acida: mapSimNaoToRisk(apiResult.prediction.Risco_Chuva_Acida),
-        fumaca_toxica: mapSimNaoToRisk(apiResult.prediction.Risco_Smog_Fotoquimico),
-        risco_efeito_estufa: mapSimNaoToRisk(apiResult.prediction.Risco_Efeito_Estufa),
-      }
+      const finalResult = {
+        cidade: "Dados Manuais",
+        features_usadas: featuresPayload,
+        qualidade_ambiental: {
+          prediction: apiResult.prediction.Qualidade_Ambiental,
+          label: apiResult.prediction.Qualidade_Ambiental,
+        },
+        risco_chuva_acida:
+          apiResult.prediction.Risco_Chuva_Acida === "Sim" ? "Alto" : "Baixo",
+        fumaca_toxica:
+          apiResult.prediction.Risco_Smog_Fotoquimico === "Sim" ? "Alto" : "Baixo",
+        risco_efeito_estufa:
+          apiResult.prediction.Risco_Efeito_Estufa === "Sim" ? "Alto" : "Baixo",
+      }
 
-      setPredictionResult(finalResult)
-    } catch (err: any) {
-      console.error("Falha ao buscar predição manual:", err)
-      setError("Não foi possível obter a predição. Verifique os valores e tente novamente.")
-    } finally {
-      setIsLoading(false)
-    }
-  }
+      setPredictionResult(finalResult)
+    } catch (err: any) {
+      console.error("Falha ao buscar predição manual:", err)
+      setError("Não foi possível obter a predição. Verifique os valores e tente novamente.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
-  // --- Funções de estilo ---
-  const getRiskColor = (risco: string) => {
-    if (!risco) return "text-gray-600 bg-gray-100"
-    switch (risco.toLowerCase()) {
-      case "baixo":
-        return "text-green-600 bg-green-100"
-      case "moderado":
-        return "text-yellow-600 bg-yellow-100"
-      case "alto":
-        return "text-red-600 bg-red-100"
-      default:
-        return "text-gray-600 bg-gray-100"
-    }
-  }
+  const getRiskColor = (risco: string) => {
+    if (!risco) return "text-gray-600 bg-gray-100"
+    switch (risco.toLowerCase()) {
+      case "baixo":
+        return "text-green-600 bg-green-100"
+      case "moderado":
+        return "text-yellow-600 bg-yellow-100"
+      case "alto":
+        return "text-red-600 bg-red-100"
+      default:
+        return "text-gray-600 bg-gray-100"
+    }
+  }
 
-  const getQualityColor = (qualidade: string) => {
-    if (!qualidade) return "text-gray-600 bg-gray-100"
-    switch (qualidade.toLowerCase()) {
-      case "excelente":
-      case "boa":
-        return "text-green-600 bg-green-100"
-      case "moderada":
-        return "text-yellow-600 bg-yellow-100"
-      case "ruim":
-        return "text-orange-600 bg-orange-100"
-      case "muito ruim":
-      case "péssima":
-        return "text-red-600 bg-red-100"
-      default:
-        return "text-gray-600 bg-gray-100"
-    }
-  }
+  const getQualityColor = (qualidade: string) => {
+    if (!qualidade) return "text-gray-600 bg-gray-100"
+    switch (qualidade.toLowerCase()) {
+      case "excelente":
+      case "boa":
+        return "text-green-600 bg-green-100"
+      case "moderada":
+        return "text-yellow-600 bg-yellow-100"
+      case "ruim":
+        return "text-orange-600 bg-orange-100"
+      case "muito ruim":
+      case "péssima":
+        return "text-red-600 bg-red-100"
+      default:
+        return "text-gray-600 bg-gray-100"
+    }
+  }
 
-  const handleManualInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target
-    setManualData({ ...manualData, [id]: value })
-  }
+  const handleManualInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target
+    setManualData({ ...manualData, [id]: value })
+  }
 
-  return (
-    <div className="min-h-screen py-12 px-4">
-      <div className="container mx-auto max-w-6xl">
+  return (
+    <div className="min-h-screen py-12 px-4">
+      <div className="container mx-auto max-w-6xl">
         {/* --- Cabeçalho --- */}
         <div className="text-center mb-12">
           <div className="space-y-4">
