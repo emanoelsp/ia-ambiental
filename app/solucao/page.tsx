@@ -464,7 +464,7 @@ export default function SolucaoPage() {
                     <CardHeader>
                       <CardTitle className="flex items-center text-xl">
                         <Beaker className="mr-2 h-6 w-6 text-indigo-500" />
-                        Valores obtidos para análise
+                        Valores obtidos
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 gap-y-3 text-sm pt-4">

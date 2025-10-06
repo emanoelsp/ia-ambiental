@@ -188,10 +188,10 @@ export default function HomePage() {
                 <CardContent className="p-0">
                   <p className="text-lg text-muted-foreground text-pretty leading-relaxed">
                     Este projeto desenvolve um sistema inteligente capaz de analisar variáveis ambientais e
-                    meteorológicas para predizer a qualidade do ar e identificar possíveis fenômenos como{" "}
-                    <span className="font-semibold text-blue-600">chuva ácida</span>,{" "}
-                    <span className="font-semibold text-orange-600">fumaça tóxica</span> e{" "}
-                    <span className="font-semibold text-green-600">efeito estufa</span>. Utilizando técnicas avançadas
+                    meteorológicas para predizer a <span className="font-semibold text-green-600"> qualidade do ar </span> e identificar possíveis fenômenos como{" "}
+                    <span className="font-semibold text-red-600">chuva ácida</span>,{" "}
+                    <span className="font-semibold text-gray-600">fumaça tóxica</span> e{" "}
+                    <span className="font-semibold text-orange-600">efeito estufa</span>. Utilizando técnicas avançadas
                     de aprendizagem de máquina e integração com APIs meteorológicas, oferecemos uma solução completa
                     para monitoramento ambiental.
                   </p>
